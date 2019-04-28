@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+void FIFO(int job_ids[], int arrival_times[], int durations[], int n);
 
 int main (){
 	char echo;
@@ -63,26 +64,46 @@ int main (){
 			j++;
 		}
 	}
-	i = 0;
-	while(i<3)
-	{
-		printf("job ids  %d \n", job_ids[i]);
-		i++;
-	}
-	i=0;
-	while(i<3)
-	{
-		printf("arrival times %d \n" , arrival_times[i]);
-		i++;
-	}
-	i=0;
-	while(i<3)
-	{
-		printf("durations %d \n", durations[i]);
-		i++;
-	}
+
+	FIFO(job_ids,arrival_times,durations,i);
 
 	fclose(f);
 	return 0;
 
 }
+
+//assumes arrival times are in ascending order
+void FIFO(int job_ids[], int arrival_times[], int durations[], int n){
+
+	int start_times[n];
+	int finish_times[n];
+	int total_times[n];
+	int response_times[n];
+
+	for(int i=0; i<n; i++)
+	{
+		if(i==0)
+		{
+			start_times[i] = 0;
+			finish_times[i] = durations[i];
+			total_times[i] = finish_times[i];
+			response_times[i] = arrival_times[i] - start_times[i];
+		}
+		else{
+			start_times[i] = finish_times[i-1];
+			finish_times[i] = start_times[i] + durations[i];
+			total_times[i] = finish_times[i] - start_times[i];
+			response_times[i] = start_times[i]- arrival_times[i];
+		}
+	
+
+	printf("JOB ID: %d \n",job_ids[i]);
+	printf("Start time: %d \n",start_times[i]);
+	printf("Finish time: %d \n",finish_times[i]);
+	printf("Time elapsed: %d \n",total_times[i]);
+	printf("Response time: %d \n",response_times[i]);
+	}
+
+} 
+
+
