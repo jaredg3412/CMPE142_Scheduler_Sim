@@ -2,12 +2,17 @@
 #include <stdlib.h>
 #include <string.h>
 void printInfo(int*, int*, int*, int*, int*, int);
+//QUEUE RETURNS ELEMENTS LEFT IN QUEUE AND MODIFIES THE QUEUE ARRAY
+int queue(int * queue, int job_ids[], int timeleft[], int ,int);
+//DE-QUEUE RETURNS ELEMENTS LEFT IN QUEUE AND MODIFIES QUEUE ARRAY
+int dequeue(int * queue, int job_ids[], int timeleft[], int, int);
 void FIFO(int job_ids[], int arrival_times[], int durations[], int n);
 void sjf(int job_ids[], int arrival_times[], int durations[], int n);
+void stcf(int job_ids[], int arrival_times[], int durations[], int n);
 
 int main (){
 	char echo;
-	char file_name [32] = "jobs1.dat";
+	char file_name [32] = "jobs.dat";
 	FILE *f;
 
 	//needed to parse input file 
@@ -16,11 +21,11 @@ int main (){
 	int job_ids[100];
 	int arrival_times[100];
 	int durations[100];
-	
+
 //    Sample data for testing
-//    int job_ids1[4] = {0,1,2,3};
-//    int arrival_times1[4] = {0,0,10,25};
-//    int durations1[4] = {100,75,50,30};
+//    int job_ids1[6] = {0,1,2,3,4,5};
+//    int arrival_times1[6] = {1,1,10,25,45,10};
+//    int durations1[6] = {100,75,50,30,20,50};
 	
 	int j = 0;
 	int i = 0;
@@ -131,14 +136,14 @@ void sjf(int job_ids[], int arrival_times[], int durations[], int n){
                 queueEnd++;
             }
         }
-        if(time == 0){
-            start_times[queue[queueStart]] = 0;
-            finish_times[queue[queueStart]] = durations[queue[queueStart]];
-            total_times[queue[queueStart]] = finish_times[queue[queueStart]];
+        if(queueStart == 0 && queueEnd != 0){
+            start_times[queue[queueStart]] = time;
+            finish_times[queue[queueStart]] = durations[queue[queueStart]] + time;
+            total_times[queue[queueStart]] = finish_times[queue[queueStart]] - time;
             response_times[queue[queueStart]] = arrival_times[queue[queueStart]] - start_times[queue[queueStart]];
             queueStart++;
         }
-        else if(time >= finish_times[queue[queueStart-1]]){
+        else if(time >= finish_times[queue[queueStart-1]] && queueStart > 0){
             jobCompletedCount++;
             //queueStart++;
             start_times[queue[queueStart]] = finish_times[queue[queueStart-1]];
@@ -152,7 +157,29 @@ void sjf(int job_ids[], int arrival_times[], int durations[], int n){
     printf("SJF Results:\n");
     printInfo(job_ids,start_times,finish_times,total_times,response_times,n);
 }
+/*
+void stcf(int job_ids[], int arrival_times[], int durations[], int n){
+    int time = 0;
+    int start_times[n], finish_times[n], total_times[n], response_times[n];
+    int timeLeft[n], queue[n];
+    int queueAmnt = 0;
+    int jobCompletedCount = 0, currentlyExecutingID = -1;
+    memcpy(timeLeft,durations,n*sizeof(int));
 
+    while(jobCompletedCount < n - 1){
+        for(int i = 0; i < n; i++){
+            if(arrival_times[i] == time) {
+                if(currentlyExecutingID != -1){
+                    if(durations[i] < timeLeft[currentlyExecutingID]){
+                        //queue it
+                        queueAmnt = queue(queue, job_ids, timeLeft, job_ids[i], queueAmnt);
+                    }
+                }
+            }
+        }
+    }
+}
+*/
 void printInfo(int job_ids[], int start_times[], int finish_times[], int total_times[], int response_times[],int n){
     printf("JOB ID\t|\tSTART TIME\t|\tFINISH TIME\t|\tTIME ELAPSED\t|\tRESPONSE TIME\n");
     printf("-----------------------------------------------------------------------------\n");
@@ -165,4 +192,33 @@ void printInfo(int job_ids[], int start_times[], int finish_times[], int total_t
     }
     printf("\n");
 }
+/*
+int queue(int * queue, int job_ids[], int timeLeft[], int jobIdInsert ,int queueAmnt){
+    int insert = queueAmnt;
+    for(int j = 0; j < queueAmnt; j++){
+        if(timeLeft[jobIdInsert] < timeLeft[queue[j]]){
+            for(int k = queueAmnt; k > j; k--) {
+                queue[k] = queue[k - 1];
+            }
+            insert = j;
+            break;
+        }
+    }
+    queue[insert] = jobIdInsert;
+    return queueAmnt + 1;
+}
 
+int dequeue(int * queue, int job_ids[], int timeLeft[], int jobIdDelete ,int queueAmnt){
+    for(int j = 0; j < queueAmnt; j++){
+        if(queue[j] == jobIdDelete){
+            for(int k = queueAmnt; k > j; k--) {
+                queue[k] = queue[k - 1];
+            }
+            insert = j;
+            break;
+        }
+    }
+    queue[insert] = jobIdInsert;
+    return queueAmnt + 1;
+}
+ */
