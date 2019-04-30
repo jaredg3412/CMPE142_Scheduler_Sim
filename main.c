@@ -157,6 +157,77 @@ void sjf(int job_ids[], int arrival_times[], int durations[], int n){
     printf("SJF Results:\n");
     printInfo(job_ids,start_times,finish_times,total_times,response_times,n);
 }
+
+void bjf(int job_ids[], int arrival_times[], int durations[], int n){
+	int time = 0;
+	int start_times[n];
+	int finish_times[n];
+	int total_times[n];
+	int response_times[n];
+
+	//Make sorting the jobs easier with a job struct
+	typedef struct{
+		int id;
+		int arrivalTime;
+		int duration;
+		bool finished;
+	} job;
+
+	//now we can make an array of jobs
+	job arr[n];
+	for(int i = 0; i != n; ++i){
+		arr[i].id = job_ids[i];
+		arr[i].arrivalTime = arrival_times[i];
+		arr[i].duration = durations[i];
+		finished = false;
+	}
+
+	//Sort by duration in descending order
+	//Since n<100, might as well just use insertion sort
+	int j;
+	job tmp;
+	for(int i = 1; i != n; ++i){
+		j = i;
+		while(j < 0 && arr[j-1].duration < arr[j].duration){
+			tmp = arr[j];
+			arr[j] = arr[j-1];
+			arr[j-1] = tmp;
+		}
+	}
+	int jobsLeft = n;
+	bool finished[n];
+
+
+	while(jobsLeft){
+		int i = 0;
+		int j = 0;
+		while(arr[i].arrivalTime > time && !arr[i].finished){
+			i++;
+		}
+		if(i == n-1){ //case where no unfinished jobs have an arrival time before the current time
+			time++;
+		}
+		else{
+			//find the original, pre-sorting index for our process
+			//job_ids is passed by reference into this function and then out of this function, so we
+			//should not alter it, rather making our output indexes match it.
+			while(arr[i].id != job_ids[j]){
+				j++;
+			}
+			start_times[j] = time;
+			time = time + arr[i].duration;
+			finish_times[j] = time;
+			total_times[j] = finish_times[j] - start_times[j];
+			response_times[j] = start_times[j] - arrival_times[j];
+			arr[i].finished = true;
+			jobsLeft--;
+		}
+	}
+
+	printf("BJF Results:\n");
+	printInfo(job_ids,start_times,finish_times,total_times,response_times,n);
+}
+
 /*
 void stcf(int job_ids[], int arrival_times[], int durations[], int n){
     int time = 0;
