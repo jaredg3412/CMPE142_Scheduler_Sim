@@ -16,7 +16,7 @@ void rr(int job_ids[], int arrival_times[], int durations[], int n);
 
 int main (){
     char echo;
-    char file_name [32] = "jobs1.dat";
+    char file_name [32] = "jobs.dat";
     FILE *f;
     char line[100];
     char *token;
