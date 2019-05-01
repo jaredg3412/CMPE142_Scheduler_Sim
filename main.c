@@ -279,7 +279,6 @@ void rr(int job_ids[], int arrival_times[], int durations[], int n){
                     current->next->next = NULL;
                 }
                 else{
-                    node_j * head = NULL;
                     head = malloc(sizeof(node_j));
                     if (head == NULL) {
                         printf("head malloc failed in rr");
@@ -321,13 +320,13 @@ void rr(int job_ids[], int arrival_times[], int durations[], int n){
             free(head);
             head = next_node;
             if(tmp.startTime == -1){
-                tmp.startTime == time;
+                tmp.startTime = time;
             }
 
             tmp.remaining--;
             time++;
             if(tmp.remaining == 0){ //process is finished
-                int i;
+                int i = 0;
                 while(tmp.id != job_ids[i]){
                     i++;
                 }
