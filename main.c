@@ -149,7 +149,7 @@ void sjf(int job_ids[], int arrival_times[], int durations[], int n){
     printf("SJF Results:\n");
     printInfo(job_ids,start_times,finish_times,total_times,response_times,n);
 }
-/*
+
 void bjf(int job_ids[], int arrival_times[], int durations[], int n){
     int time = 0;
     int start_times[n];
@@ -171,7 +171,7 @@ void bjf(int job_ids[], int arrival_times[], int durations[], int n){
         arr[i].id = job_ids[i];
         arr[i].arrivalTime = arrival_times[i];
         arr[i].duration = durations[i];
-        finished = false;
+        arr[i].finished = false;
     }
 
     //Sort by duration in descending order
@@ -187,16 +187,14 @@ void bjf(int job_ids[], int arrival_times[], int durations[], int n){
         }
     }
     int jobsLeft = n;
-    bool finished[n];
-
 
     while(jobsLeft){
         int i = 0;
         int j = 0;
-        while(arr[i].arrivalTime > time && !arr[i].finished){
+        while((arr[i].arrivalTime > time) || (arr[i].finished)){
             i++;
         }
-        if(i == n-1){ //case where no unfinished jobs have an arrival time before the current time
+        if(i == n){ //case where no unfinished jobs have an arrival time before the current time
             time++;
         }
         else{
@@ -209,7 +207,7 @@ void bjf(int job_ids[], int arrival_times[], int durations[], int n){
             start_times[j] = time;
             time = time + arr[i].duration;
             finish_times[j] = time;
-            total_times[j] = finish_times[j] - start_times[j];
+            total_times[j] = finish_times[j] - arrival_times[j];
             response_times[j] = start_times[j] - arrival_times[j];
             arr[i].finished = true;
             jobsLeft--;
@@ -255,11 +253,11 @@ void rr(int job_ids[], int arrival_times[], int durations[], int n){
     node_j * head = NULL;
     head = malloc(sizeof(node_j));
     if (head == NULL) {
-        return 1;
+        printf("head malloc failed in rr");
+        exit(1);
     }
     bool headAssigned = false;
     int jobsLeft = n;
-
 
     while(jobsLeft){
 
@@ -277,6 +275,12 @@ void rr(int job_ids[], int arrival_times[], int durations[], int n){
                     current->next->next = NULL;
                 }
                 else{
+                    node_j * head = NULL;
+                    head = malloc(sizeof(node_j));
+                    if (head == NULL) {
+                        printf("head malloc failed in rr");
+                        exit(1);
+                    }
                     head->data = arr[i];
                     head->next = NULL;
                     headAssigned = true;
@@ -299,7 +303,7 @@ void rr(int job_ids[], int arrival_times[], int durations[], int n){
                 }
                 start_times[i] = head->data.startTime;
                 finish_times[i] = time;
-                total_times[i] = finish_times[i] - start_times[i];
+                total_times[i] = finish_times[i] - arrival_times[i];
                 response_times[i] = start_times[i] - arrival_times[i];
                 headAssigned = false;
                 free(head);
@@ -311,7 +315,7 @@ void rr(int job_ids[], int arrival_times[], int durations[], int n){
             node_j * next_node = NULL;
             next_node = head->next;
             free(head);
-            *head = next_node;
+            head = next_node;
             if(tmp.startTime == -1){
                 tmp.startTime == time;
             }
@@ -325,7 +329,7 @@ void rr(int job_ids[], int arrival_times[], int durations[], int n){
                 }
                 start_times[i] = tmp.startTime;
                 finish_times[i] = time;
-                total_times[i] = finish_times[i] - start_times[i];
+                total_times[i] = finish_times[i] - arrival_times[i];
                 response_times[i] = start_times[i] - arrival_times[i];
                 jobsLeft--;
             }
@@ -347,7 +351,6 @@ void rr(int job_ids[], int arrival_times[], int durations[], int n){
     printInfo(job_ids,start_times,finish_times,total_times,response_times,n);
 }
 
-*/
 void stcf(int job_ids[], int arrival_times[], int durations[], int n){
     int time = 0;
     int start_times[n], finish_times[n], total_times[n], response_times[n];
