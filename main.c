@@ -162,6 +162,7 @@ void sjf(int job_ids[], int arrival_times[], int durations[], int n){
 }
 
 void bjf(int job_ids[], int arrival_times[], int durations[], int n){
+<<<<<<< HEAD
     int time = 0;
     int start_times[n];
     int finish_times[n];
@@ -305,6 +306,151 @@ void rr(int job_ids[], int arrival_times[], int durations[], int n){
             time++;
             if(head->data.remaining == 0){ // process is finished
                 int i;
+=======
+	int time = 0;
+	int start_times[n];
+	int finish_times[n];
+	int total_times[n];
+	int response_times[n];
+
+	//Make sorting the jobs easier with a job struct
+	typedef struct{
+		int id;
+		int arrivalTime;
+		int duration;
+		bool finished;
+	} job;
+
+	//now we can make an array of jobs
+	job arr[n];
+	for(int i = 0; i != n; ++i){
+		arr[i].id = job_ids[i];
+		arr[i].arrivalTime = arrival_times[i];
+		arr[i].duration = durations[i];
+		finished = false;
+	}
+
+	//Sort by duration in descending order
+	//Since n<100, might as well just use insertion sort
+	int j;
+	job tmp;
+	for(int i = 1; i != n; ++i){
+		j = i;
+		while(j < 0 && arr[j-1].duration < arr[j].duration){
+			tmp = arr[j];
+			arr[j] = arr[j-1];
+			arr[j-1] = tmp;
+		}
+	}
+	int jobsLeft = n;
+	bool finished[n];
+
+
+	while(jobsLeft){
+		int i = 0;
+		int j = 0;
+		while(arr[i].arrivalTime > time && !arr[i].finished){
+			i++;
+		}
+		if(i == n-1){ //case where no unfinished jobs have an arrival time before the current time
+			time++;
+		}
+		else{
+			//find the original, pre-sorting index for our process
+			//job_ids is passed by reference into this function and then out of this function, so we
+			//should not alter it, rather making our output indexes match it.
+			while(arr[i].id != job_ids[j]){
+				j++;
+			}
+			start_times[j] = time;
+			time = time + arr[i].duration;
+			finish_times[j] = time;
+			total_times[j] = finish_times[j] - start_times[j];
+			response_times[j] = start_times[j] - arrival_times[j];
+			arr[i].finished = true;
+			jobsLeft--;
+		}
+	}
+
+	printf("BJF Results:\n");
+	printInfo(job_ids,start_times,finish_times,total_times,response_times,n);
+}
+
+void rr(int job_ids[], int arrival_times[], int durations[], int n){
+	int time = 0;
+	int start_times[n];
+	int finish_times[n];
+	int total_times[n];
+	int response_times[n];
+
+	//struct to organize job info in a linked list easily
+	typedef struct{
+		int id;
+		int arrivalTime;
+		int startTime;
+		int duration;
+		int remaining;
+		bool listed;
+	} job;
+
+	job arr[n];
+	for(int i = 0; i != n; ++i){
+		arr[i].id = job_ids[i];
+		arr[i].arrivalTime = arrival_times[i];
+		arr[i].duration = durations[i];
+		arr[i].remaining = arr[i].duration;
+		arr[i].listed = false;
+		arr[i].startTime = -1;
+	}
+
+	typedef struct node {
+		job data;
+		struct node * next;
+	} node_j;
+
+	node_j * head = NULL;
+	head = malloc(sizeof(node_j));
+	if (head == NULL) {
+		return 1;
+	}
+	bool headAssigned = false;
+	int jobsLeft = n;
+
+
+	while(jobsLeft){
+
+	    //adds all jobs that have arrived so far to our linked-list FIFO queue
+		for(int i = 0; i != n; ++i){
+			if(arr[i].arrivalTime <= time && !arr[i].listed){
+				arr[i].listed = true;
+				if(headAssigned){
+					node_j * current = head;
+					while(current->next != NULL){
+						current = current->next;
+					}
+                    current->next = malloc(sizeof(node_j));
+                    current->next->data = arr[i];
+                    current->next->next = NULL;
+				}
+				else{
+					head->data = arr[i];
+					head->next = NULL;
+					headAssigned = true;
+				}
+			}
+		}
+
+		//Take the head off the list, work on it for a 1 second timeslice, put it back on the end of the list
+		//If that 1 second finishes the process, add it's data to the output arrays and tag it as finished
+		if(head->next == NULL){ // only one item in list
+		    if(head->data.startTime == -1){
+		        head->data.startTime = time;
+		    }
+		    head->data.remaining--;
+		    time++;
+		    if(head->data.remaining == 0){ // process is finished
+		        int i;
+>>>>>>> a5b81a9a9ec29fcb125456e881b11a3c00015d3a
                 while(head->data.id != job_ids[i]){
                     i++;
                 }
@@ -313,12 +459,21 @@ void rr(int job_ids[], int arrival_times[], int durations[], int n){
                 total_times[i] = finish_times[i] - start_times[i];
                 response_times[i] = start_times[i] - arrival_times[i];
                 headAssigned = false;
+<<<<<<< HEAD
                 free(head);
                 jobsLeft--;
             }
         }
         else{// multiple items in list, take the first item off
             job tmp = head->data;
+=======
+		        free(head);
+		        jobsLeft--;
+		    }
+		}
+		else{// multiple items in list, take the first item off
+		    job tmp = head->data;
+>>>>>>> a5b81a9a9ec29fcb125456e881b11a3c00015d3a
             node_j * next_node = NULL;
             next_node = head->next;
             free(head);
@@ -350,15 +505,25 @@ void rr(int job_ids[], int arrival_times[], int durations[], int n){
                 current->next->next = NULL;
             }
 
+<<<<<<< HEAD
         }
 
     }
+=======
+		}
+
+	}
+>>>>>>> a5b81a9a9ec29fcb125456e881b11a3c00015d3a
 
     printf("RR Results:\n");
     printInfo(job_ids,start_times,finish_times,total_times,response_times,n);
 }
 
 
+<<<<<<< HEAD
+=======
+/*
+>>>>>>> a5b81a9a9ec29fcb125456e881b11a3c00015d3a
 void stcf(int job_ids[], int arrival_times[], int durations[], int n){
     int time = 0;
     int start_times[n], finish_times[n], total_times[n], response_times[n];
