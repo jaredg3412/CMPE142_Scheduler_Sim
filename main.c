@@ -10,7 +10,9 @@ int requeue(int * queue, int job_ids[], int timeleft[], int ,int);
 int dequeue(int * queue, int job_ids[], int timeleft[], int, int);
 void FIFO(int job_ids[], int arrival_times[], int durations[], int n);
 void sjf(int job_ids[], int arrival_times[], int durations[], int n);
+void bjf(int job_ids[], int arrival_times[], int durations[], int n);
 void stcf(int job_ids[], int arrival_times[], int durations[], int n);
+void rr(int job_ids[], int arrival_times[], int durations[], int n);
 
 int main (){
 	char echo;
@@ -69,8 +71,10 @@ int main (){
 	}
 	FIFO(job_ids,arrival_times,durations,i);
 	sjf(job_ids,arrival_times,durations,i);
-        stcf(job_ids,arrival_times,durations,i);
-    
+	bjf(job_ids,arrival_times,durations,i);
+	stcf(job_ids,arrival_times,durations,i);
+    rr(job_ids,arrival_times,durations,i);
+
 	fclose(f);
 	return 0;
 
