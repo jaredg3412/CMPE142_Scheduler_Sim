@@ -16,7 +16,8 @@ int main (){
 	char echo;
 	char file_name [32] = "jobs.dat";
 	FILE *f;
-
+	char line[100];
+	char *token;
 	//needed to parse input file 
 	char buffer[32];
 	int integers[300];
@@ -42,46 +43,34 @@ int main (){
 		perror("Cannot open file. \n");
 	}
 	
-	while((echo = fgetc(f)) != EOF){
-		if(echo == ' ' )
-		{
-			if(arraytype == 0)
-			{
-				job_ids[i] = atoi(buffer);
+	while(fgets(line,100,f)){
+		token = strtok(line," \t\n");
+
+		while(token != NULL){
+			
+			if(arraytype == 0){
+				job_ids[i] = atoi(token);
 				i++;
-				bzero(buffer,32);
-				j=0;
 				arraytype++;
 			}
-			else
-			{
-				arrival_times[t] = atoi(buffer);
+			else if(arraytype == 1){
+				arrival_times[j] = atoi(token);
+				j++;
+				arraytype++;
+			}
+			else{
+				durations[t] = atoi(token);
 				t++;
-				bzero(buffer,32);
-				j=0;
-				arraytype++;
+				arraytype = 0;
 
 			}
-		}
-		else if(echo == '\n')
-		{
-			durations[d] = atoi(buffer);
-			d++;
-			bzero(buffer,32);
-			j=0;
-			arraytype=0;
-
-		}
-		else
-		{
-			buffer[j] = echo;
-			j++;
+			token = strtok(NULL, " \t\n");
 		}
 	}
-
 	FIFO(job_ids,arrival_times,durations,i);
 	sjf(job_ids,arrival_times,durations,i);
-    stcf(job_ids,arrival_times,durations,i);
+        stcf(job_ids,arrival_times,durations,i);
+    
 	fclose(f);
 	return 0;
 
@@ -160,7 +149,7 @@ void sjf(int job_ids[], int arrival_times[], int durations[], int n){
     printf("SJF Results:\n");
     printInfo(job_ids,start_times,finish_times,total_times,response_times,n);
 }
-
+/*
 void bjf(int job_ids[], int arrival_times[], int durations[], int n){
     int time = 0;
     int start_times[n];
@@ -358,7 +347,7 @@ void rr(int job_ids[], int arrival_times[], int durations[], int n){
     printInfo(job_ids,start_times,finish_times,total_times,response_times,n);
 }
 
-
+*/
 void stcf(int job_ids[], int arrival_times[], int durations[], int n){
     int time = 0;
     int start_times[n], finish_times[n], total_times[n], response_times[n];
@@ -469,3 +458,4 @@ int dequeue(int * queue, int job_ids[], int timeLeft[], int jobIdDelete ,int que
     }
     return queueAmnt - 1;
 }
+
