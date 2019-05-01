@@ -16,7 +16,7 @@ void rr(int job_ids[], int arrival_times[], int durations[], int n);
 
 int main (){
     char echo;
-    char file_name [32] = "jobs.dat";
+    char file_name [32] = "jobs1.dat";
     FILE *f;
     char line[100];
     char *token;
@@ -99,7 +99,7 @@ void FIFO(int job_ids[], int arrival_times[], int durations[], int n){
         else{
             start_times[i] = finish_times[i-1];
             finish_times[i] = start_times[i] + durations[i];
-            total_times[i] = finish_times[i] - start_times[i];
+            total_times[i] = finish_times[i] - arrival_times[i];
             response_times[i] = start_times[i]- arrival_times[i];
         }
     }
