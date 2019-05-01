@@ -15,142 +15,95 @@ void stcf(int job_ids[], int arrival_times[], int durations[], int n);
 void rr(int job_ids[], int arrival_times[], int durations[], int n);
 
 int main (){
-	char echo;
-	char file_name [32] = "jobs.dat";
-	FILE *f;
-	char line[100];
-	char *token;
-	//needed to parse input file 
-	char buffer[32];
-	int integers[300];
-	int job_ids[100];
-	int arrival_times[100];
-	int durations[100];
+    char echo;
+    char file_name [32] = "jobs.dat";
+    FILE *f;
+    char line[100];
+    char *token;
+    //needed to parse input file
+    char buffer[32];
+    int integers[300];
+    int job_ids[100];
+    int arrival_times[100];
+    int durations[100];
 
 //    Sample data for testing
 //    int job_ids1[6] = {0,1,2,3,4,5};
 //    int arrival_times1[6] = {1,1,10,25,45,10};
 //    int durations1[6] = {100,75,50,30,20,50};
-	
-	int j = 0;
-	int i = 0;
-	int t = 0;
-	int d = 0;
-	int arraytype = 0;
 
-	f = fopen(file_name, "r");
+    int j = 0;
+    int i = 0;
+    int t = 0;
+    int d = 0;
+    int arraytype = 0;
 
-	if(f == NULL)
-	{
-		perror("Cannot open file. \n");
-	}
-	
-	while(fgets(line,100,f)){
-		token = strtok(line," \t\n");
+    f = fopen(file_name, "r");
 
-		while(token != NULL){
-			
-			if(arraytype == 0){
-				job_ids[i] = atoi(token);
-				i++;
-				arraytype++;
-			}
-			else if(arraytype == 1){
-				arrival_times[j] = atoi(token);
-				j++;
-				arraytype++;
-			}
-			else{
-				durations[t] = atoi(token);
-				t++;
-				arraytype = 0;
+    if(f == NULL)
+    {
+        perror("Cannot open file. \n");
+    }
 
-			}
-			token = strtok(NULL, " \t\n");
-		}
-	}
-	FIFO(job_ids,arrival_times,durations,i);
-	sjf(job_ids,arrival_times,durations,i);
-	bjf(job_ids,arrival_times,durations,i);
-	stcf(job_ids,arrival_times,durations,i);
+    while(fgets(line,100,f)){
+        token = strtok(line," \t\n");
+
+        while(token != NULL){
+
+            if(arraytype == 0){
+                job_ids[i] = atoi(token);
+                i++;
+                arraytype++;
+            }
+            else if(arraytype == 1){
+                arrival_times[j] = atoi(token);
+                j++;
+                arraytype++;
+            }
+            else{
+                durations[t] = atoi(token);
+                t++;
+                arraytype = 0;
+
+            }
+            token = strtok(NULL, " \t\n");
+        }
+    }
+    FIFO(job_ids,arrival_times,durations,i);
+    sjf(job_ids,arrival_times,durations,i);
+    bjf(job_ids,arrival_times,durations,i);
+    stcf(job_ids,arrival_times,durations,i);
     rr(job_ids,arrival_times,durations,i);
 
-	fclose(f);
-	return 0;
+    fclose(f);
+    return 0;
 
 }
 
 //assumes arrival times are in ascending order
 void FIFO(int job_ids[], int arrival_times[], int durations[], int n){
 
-	int start_times[n];
-	int finish_times[n];
-	int total_times[n];
-	int response_times[n];
-	for(int i=0; i<n; i++)
-	{
-		if(i==0)
-		{
-			start_times[i] = 0;
-			finish_times[i] = durations[i];
-			total_times[i] = finish_times[i];
-			response_times[i] = arrival_times[i] - start_times[i];
-		}
-		else{
-			start_times[i] = finish_times[i-1];
-			finish_times[i] = start_times[i] + durations[i];
-			total_times[i] = finish_times[i] - start_times[i];
-			response_times[i] = start_times[i]- arrival_times[i];
-		}
-	}
-	printf("FIFO Results:\n");
-	printInfo(job_ids,start_times,finish_times,total_times,response_times,n);
-}
-
-void sjf(int job_ids[], int arrival_times[], int durations[], int n){
-    int time = 0;
     int start_times[n];
     int finish_times[n];
     int total_times[n];
     int response_times[n];
-    int queue[n+1];
-    int queueStart = 0, queueEnd = 0, jobCompletedCount = 0;
-    while(jobCompletedCount < n - 1){
-        for(int i = 0; i < n; i++){
-            if(arrival_times[i] == time){
-                int insert = queueEnd;
-                for(int j = queueStart; j < queueEnd; j++){
-                    if(durations[i] < durations[queue[j]]){
-                        for(int k = queueEnd; k > j; k--) {
-                            queue[k] = queue[k - 1];
-                        }
-                        insert = j;
-                        break;
-                    }
-                }
-                queue[insert] = job_ids[i];
-                queueEnd++;
-            }
+    for(int i=0; i<n; i++)
+    {
+        if(i==0)
+        {
+            start_times[i] = 0;
+            finish_times[i] = durations[i];
+            total_times[i] = finish_times[i];
+            response_times[i] = arrival_times[i] - start_times[i];
         }
-        if(queueStart == 0 && queueEnd != 0){
-            start_times[queue[queueStart]] = time;
-            finish_times[queue[queueStart]] = durations[queue[queueStart]] + time;
-            total_times[queue[queueStart]] = finish_times[queue[queueStart]] - time;
-            response_times[queue[queueStart]] = arrival_times[queue[queueStart]] - start_times[queue[queueStart]];
-            queueStart++;
+        else{
+            start_times[i] = finish_times[i-1];
+            finish_times[i] = start_times[i] + durations[i];
+            total_times[i] = finish_times[i] - start_times[i];
+            response_times[i] = start_times[i]- arrival_times[i];
         }
-        else if(time >= finish_times[queue[queueStart-1]] && queueStart > 0){
-            jobCompletedCount++;
-            //queueStart++;
-            start_times[queue[queueStart]] = finish_times[queue[queueStart-1]];
-            finish_times[queue[queueStart]] = start_times[queue[queueStart]] + durations[queue[queueStart]];
-            total_times[queue[queueStart]] = finish_times[queue[queueStart]] - start_times[queue[queueStart]];
-            response_times[queue[queueStart]] = start_times[queue[queueStart]]- arrival_times[queue[queueStart]];
-            queueStart++;
-        }
-        time++;
     }
-    printf("SJF Results:\n");
+    printf("FIFO Results:\n");
     printInfo(job_ids,start_times,finish_times,total_times,response_times,n);
 }
 
@@ -353,6 +306,54 @@ void rr(int job_ids[], int arrival_times[], int durations[], int n){
     printf("RR Results:\n");
     printInfo(job_ids,start_times,finish_times,total_times,response_times,n);
 }
+void sjf(int job_ids[], int arrival_times[], int durations[], int n){
+    int time = 0;
+    int start_times[n];
+    int finish_times[n];
+    int total_times[n];
+    int response_times[n];
+    int queue[n+1];
+    int queueStart = 0, queueEnd = 0, jobCompletedCount = 0;
+    while(jobCompletedCount < n || queueStart < n){
+        for(int i = 0; i < n; i++){
+            if(arrival_times[i] == time){
+                int insert = queueEnd;
+                for(int j = queueStart; j < queueEnd; j++){
+                    if(durations[i] < durations[queue[j]]){
+                        for(int k = queueEnd; k > j; k--) {
+                            queue[k] = queue[k - 1];
+                        }
+                        insert = j;
+                        break;
+                    }
+                }
+                queue[insert] = i;
+                queueEnd++;
+            }
+        }
+        if(queueStart == 0 && queueEnd != 0){
+            start_times[queue[queueStart]] = time;
+            finish_times[queue[queueStart]] = durations[queue[queueStart]] + time;
+            total_times[queue[queueStart]] = finish_times[queue[queueStart]] - arrival_times[queue[queueStart]];
+            response_times[queue[queueStart]] = arrival_times[queue[queueStart]] - start_times[queue[queueStart]];
+            queueStart++;
+            jobCompletedCount++;
+        }
+        else if(time >= finish_times[queue[queueStart-1]] && queueStart > 0){
+            jobCompletedCount++;
+            //queueStart++;
+            start_times[queue[queueStart]] = finish_times[queue[queueStart-1]];
+            finish_times[queue[queueStart]] = start_times[queue[queueStart]] + durations[queue[queueStart]];
+            total_times[queue[queueStart]] = finish_times[queue[queueStart]] - arrival_times[queue[queueStart]];
+            response_times[queue[queueStart]] = start_times[queue[queueStart]]- arrival_times[queue[queueStart]];
+            queueStart++;
+        }
+        time++;
+    }
+    printf("SJF Results:\n");
+    printInfo(job_ids,start_times,finish_times,total_times,response_times,n);
+}
+
 
 void stcf(int job_ids[], int arrival_times[], int durations[], int n){
     int time = 0;
@@ -360,64 +361,61 @@ void stcf(int job_ids[], int arrival_times[], int durations[], int n){
     int timeLeft[n];
     int queue[n];
     int queueAmnt = 0;
-    int jobCompletedCount = 0, currentlyExecutingID = -1;
+    int jobCompletedCount = 0, currentlyExecutingIndex = -1;
     memcpy(timeLeft,durations,n*sizeof(int));
 
     while(jobCompletedCount < n){
         for(int i = 0; i < n; i++){
             if(arrival_times[i] == time) {
-                if(currentlyExecutingID != -1){
-                    if(durations[i] < timeLeft[currentlyExecutingID]){
+                if(currentlyExecutingIndex != -1){
+                    if(durations[i] < timeLeft[currentlyExecutingIndex]){
                         //queue it
-                        queueAmnt = requeue(queue, job_ids, timeLeft, currentlyExecutingID, queueAmnt);
-                        currentlyExecutingID =  job_ids[i];
+                        queueAmnt = requeue(queue, job_ids, timeLeft, currentlyExecutingIndex, queueAmnt);
+                        currentlyExecutingIndex =  i;
                     }
                     else{
-                        queueAmnt = requeue(queue, job_ids, timeLeft, job_ids[i], queueAmnt);
+                        queueAmnt = requeue(queue, job_ids, timeLeft, i, queueAmnt);
                     }
                 }
                 else{
-                    queueAmnt = requeue(queue, job_ids, timeLeft, job_ids[i], queueAmnt);
+                    queueAmnt = requeue(queue, job_ids, timeLeft, i, queueAmnt);
                 }
             }
         }
-        if((currentlyExecutingID == -1) && queueAmnt > 0){
+        if((currentlyExecutingIndex == -1) && queueAmnt > 0){
             //initialize everything
-            currentlyExecutingID = queue[0];
-            start_times[currentlyExecutingID] = time;
-            //finish_times[currentlyExecutingID] = durations[currentlyExecutingID] + time;
-            //total_times[currentlyExecutingID] = finish_times[currentlyExecutingID] - time;
-            response_times[currentlyExecutingID] = start_times[currentlyExecutingID] - arrival_times[currentlyExecutingID];
-            queueAmnt = dequeue(queue,job_ids,timeLeft,currentlyExecutingID,queueAmnt);
-            timeLeft[currentlyExecutingID] = timeLeft[currentlyExecutingID] - 1;
+            currentlyExecutingIndex = queue[0];
+            start_times[currentlyExecutingIndex] = time;
+            response_times[currentlyExecutingIndex] = start_times[currentlyExecutingIndex] - arrival_times[currentlyExecutingIndex];
+            queueAmnt = dequeue(queue,job_ids,timeLeft,currentlyExecutingIndex,queueAmnt);
+            timeLeft[currentlyExecutingIndex] = timeLeft[currentlyExecutingIndex] - 1;
         }
-        else if (currentlyExecutingID != -1){
-            if(timeLeft[currentlyExecutingID] == 0){
-                finish_times[currentlyExecutingID] = time;
-                total_times[currentlyExecutingID] = finish_times[currentlyExecutingID] - start_times[currentlyExecutingID];
-                //response_times[currentlyExecutingID] = arrival_times[currentlyExecutingID] - start_times[currentlyExecutingID];
+        else if (currentlyExecutingIndex != -1){
+            if(timeLeft[currentlyExecutingIndex] == 0){
+                finish_times[currentlyExecutingIndex] = time;
+                total_times[currentlyExecutingIndex] = finish_times[currentlyExecutingIndex] - arrival_times[currentlyExecutingIndex];
                 if(queueAmnt > 0) {
-                    currentlyExecutingID = queue[0];
-                    queueAmnt = dequeue(queue, job_ids, timeLeft, currentlyExecutingID, queueAmnt);
-                    if (timeLeft[currentlyExecutingID] == durations[currentlyExecutingID]) {
-                        start_times[currentlyExecutingID] = time;
-                        response_times[currentlyExecutingID] =
-                                start_times[currentlyExecutingID] - arrival_times[currentlyExecutingID];
+                    currentlyExecutingIndex = queue[0];
+                    queueAmnt = dequeue(queue, job_ids, timeLeft, currentlyExecutingIndex, queueAmnt);
+                    if (timeLeft[currentlyExecutingIndex] == durations[currentlyExecutingIndex]) {
+                        start_times[currentlyExecutingIndex] = time;
+                        response_times[currentlyExecutingIndex] =
+                                start_times[currentlyExecutingIndex] - arrival_times[currentlyExecutingIndex];
                     }
-                    timeLeft[currentlyExecutingID] = timeLeft[currentlyExecutingID] - 1;
+                    timeLeft[currentlyExecutingIndex] = timeLeft[currentlyExecutingIndex] - 1;
                 }
                 else{
-                    currentlyExecutingID = -1;
+                    currentlyExecutingIndex = -1;
                 }
                 jobCompletedCount++;
             }
-            else if (timeLeft[currentlyExecutingID] == durations[currentlyExecutingID]){
-                start_times[currentlyExecutingID] = time;
-                response_times[currentlyExecutingID] = start_times[currentlyExecutingID] - arrival_times[currentlyExecutingID];
-                timeLeft[currentlyExecutingID] = timeLeft[currentlyExecutingID] - 1;
+            else if (timeLeft[currentlyExecutingIndex] == durations[currentlyExecutingIndex]){
+                start_times[currentlyExecutingIndex] = time;
+                response_times[currentlyExecutingIndex] = start_times[currentlyExecutingIndex] - arrival_times[currentlyExecutingIndex];
+                timeLeft[currentlyExecutingIndex] = timeLeft[currentlyExecutingIndex] - 1;
             }
             else{
-                timeLeft[currentlyExecutingID] = timeLeft[currentlyExecutingID] - 1;
+                timeLeft[currentlyExecutingIndex] = timeLeft[currentlyExecutingIndex] - 1;
             }
         }
         time++;
@@ -428,17 +426,16 @@ void stcf(int job_ids[], int arrival_times[], int durations[], int n){
 
 void printInfo(int job_ids[], int start_times[], int finish_times[], int total_times[], int response_times[],int n){
     printf("JOB ID\t|\tSTART TIME\t|\tFINISH TIME\t|\tTIME ELAPSED\t|\tRESPONSE TIME\n");
-    printf("-----------------------------------------------------------------------------\n");
+    printf("------------------------------------------------------------------------------------------------------\n");
     for(int i=0; i<n; i++){
-        printf("%d\t\t\t",job_ids[i]);
-        printf("%d\t\t\t\t",start_times[i]);
-        printf("%d\t\t\t\t",finish_times[i]);
-        printf("%d\t\t\t\t\t",total_times[i]);
-        printf("%d\t\t\n",response_times[i]);
+        printf("%d\t \t",job_ids[i]);
+        printf("%d\t\t \t",start_times[i]);
+        printf("%d\t\t \t",finish_times[i]);
+        printf("%d\t\t \t",total_times[i]);
+        printf("%d\t\t \t\n",response_times[i]);
     }
     printf("\n");
 }
-
 int requeue(int * queue, int job_ids[], int timeLeft[], int jobIdInsert ,int queueAmnt){
     int insert = queueAmnt;
     for(int j = 0; j < queueAmnt; j++){
